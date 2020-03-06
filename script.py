@@ -21,20 +21,26 @@ for file in all_files:
 
     # print(file)
     # print(text)
-
-    for term in key_terms:
-        case = [sentence + '.' for sentence in text.split('.') if term in sentence]
-        # print(type(case))
-        # print(len(case))
-        if len(case) == 0:
-            cognitive = False
-            case = "Not cognitive"
-            case_list.append(case)
-            cognitive_list.append(cognitive)
-        else:
-            cognitive = True
-            case_list.append(case)
-            cognitive_list.append(cognitive)
+    if "alzheimer’s" in text:
+        print("A-True")
+        case = [sentence + '.' for sentence in text.split('.') if "alzheimer’s" in sentence]
+    elif "dementia" in text:
+        print("M-True")
+    else:
+        print("false")
+    # for term in key_terms:
+    #     case = [sentence + '.' for sentence in text.split('.') if term in sentence]
+    #     # print(type(case))
+    #     # print(len(case))
+    #     if len(case) == 0:
+    #         cognitive = False
+    #         case = "Not cognitive"
+    #         case_list.append(case)
+    #         cognitive_list.append(cognitive)
+    #     else:
+    #         cognitive = True
+    #         case_list.append(case)
+    #         cognitive_list.append(cognitive)
     # print(f"{case} in {file}")
 print(dates_list)
 print(case_list)
