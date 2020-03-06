@@ -1,0 +1,4 @@
+chardet==3.0.4
+pdfminer.six==20200124
+pycryptodome==3.9.7
+sortedcontainers==2.1.0
