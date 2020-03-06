@@ -6,7 +6,7 @@ import re
 path = 'pdfs' # use your path
 all_files = glob.glob(path + "/*.pdf")
 
-key_terms = ["dementia", "alzheimer’s"]
+key_terms = ["alzheimer’s", "dementia"]
 dates_list = []
 case_list = []
 cognitive_list = []
@@ -21,6 +21,7 @@ for file in all_files:
 
     # print(file)
     # print(text)
+
     for term in key_terms:
         case = [sentence + '.' for sentence in text.split('.') if term in sentence]
         # print(type(case))
