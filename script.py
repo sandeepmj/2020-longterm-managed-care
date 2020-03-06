@@ -1,22 +1,40 @@
 import glob
 from pdfminer.high_level import extract_text
+import re
 
 
 path = 'pdfs' # use your path
 all_files = glob.glob(path + "/*.pdf")
 
 key_terms = ["dementia", "alzheimer’s"]
-
+dates_list = []
+case_list = []
+cognitive_list = []
 for file in all_files:
     text = extract_text(file)
     text = text.lower()
+    match = re.findall(('request: .+'), text)
+    # date = match.replace('request:', "")
+    date = [item.replace('request:', "").strip() for item in match]
+    # print(f"date : {date}")
+    dates_list.append(date)
+
     # print(file)
     # print(text)
     for term in key_terms:
         case = [sentence + '.' for sentence in text.split('.') if term in sentence]
-        print(type(case))
-        print(len(case))
+        # print(type(case))
+        # print(len(case))
         if len(case) == 0:
-            pass
+            cognitive = False
+            case = "Not cognitive"
+            case_list.append(case)
+            cognitive_list.append(cognitive)
         else:
-            print(f"{case} in {file}")
+            cognitive = True
+            case_list.append(case)
+            cognitive_list.append(cognitive)
+    # print(f"{case} in {file}")
+print(dates_list)
+print(case_list)
+print(cognitive_list)
