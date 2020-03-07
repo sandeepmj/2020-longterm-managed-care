@@ -8,8 +8,8 @@ all_files = glob.glob(path + "/*.pdf")
 
 key_terms = ["alzheimer’s", "dementia"]
 dates_list = []
-case_list = []
-cognitive_list = []
+occurence_list = []
+cognition_list = []
 status_list = []
 for file in all_files:
     text = extract_text(file)
@@ -24,15 +24,15 @@ for file in all_files:
     # print(text)
     for sentence in file:
 #         print(sentence)
-        case = [sentence + '.' for sentence in text.split('.') if "dementia" in sentence or "alzheimer’s" in sentence]
-        status = [True]
+        occurence = [sentence + '.' for sentence in text.split('.') if "dementia" in sentence or "alzheimer’s" in sentence]
+        cognition = [True]
     #         print(case)
     #         print(len(case))
-        if len(case) == 0:
-            status = [False]
-            case = ["NO OCCURENCES"]
-    case_list.append(case)
-    status_list.append(status)
+        if len(occurence) == 0:
+            cognition = [False]
+            occurence = ["NO OCCURENCES"]
+    occurence_list.append(occurence)
+    cognition_list.append(cognition)
 
     #         elif "alzheimer’s" in case and "dementia" in case:
     #             status = "ALZ"
@@ -41,5 +41,5 @@ for file in all_files:
     # print(f"status is {status} and sentence is {case}")
     # print(f"{case} in {file}")
 print(dates_list)
-print(case_list)
-print(status_list)
+print(occurence_list)
+print(cognition_list)
