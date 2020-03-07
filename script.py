@@ -10,6 +10,7 @@ key_terms = ["alzheimer’s", "dementia"]
 dates_list = []
 case_list = []
 cognitive_list = []
+status_list = []
 for file in all_files:
     text = extract_text(file)
     text = text.lower()
@@ -21,21 +22,22 @@ for file in all_files:
 
     # print(file)
     # print(text)
-
-    for term in key_terms:
-        case = [sentence + '.' for sentence in text.split('.') if term in sentence]
-        # print(type(case))
-        # print(len(case))
+    for sentence in file:
+#         print(sentence)
+        case = [sentence + '.' for sentence in text.split('.') if "dementia" in sentence or "alzheimer’s" in sentence]
+        status = [True]
+    #         print(case)
+    #         print(len(case))
         if len(case) == 0:
-            cognitive = False
-            case = "Not cognitive"
+            status = [False]
+            case = ["NO OCCURENCES"]
             case_list.append(case)
-            cognitive_list.append(cognitive)
-        else:
-            cognitive = True
-            case_list.append(case)
-            cognitive_list.append(cognitive)
+    #         elif "alzheimer’s" in case and "dementia" in case:
+    #             status = "ALZ"
+    #         elif "alzheimer’s" not in case and "dementia"
+
+    print(f"status is {status} and sentence is {case}")
     # print(f"{case} in {file}")
 print(dates_list)
-print(case_list)
-print(cognitive_list)
+# print(case_list)
+# print(cognitive_list)
