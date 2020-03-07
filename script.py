@@ -18,16 +18,27 @@ for file in all_files:
     date = [item.replace('request:', "").strip() for item in match]
     # print(f"date : {date}")
     dates_list.append(date)
+    sentences = text.split('.')
+    # print(units)
+    for sentence in sentences:
+        if "alzheimer’s" in sentence:
+            print("A-True")
+            print(sentence)
+        elif "dementia" in sentence:
+            print("M-True")
+            print(sentence)
+        else:
+            pass
 
-    # print(file)
-    # print(text)
-    if "alzheimer’s" in text:
-        print("A-True")
-        case = [sentence + '.' for sentence in text.split('.') if "alzheimer’s" in sentence]
-    elif "dementia" in text:
-        print("M-True")
-    else:
-        print("false")
+    # # print(file)
+    # # print(text)
+    # if "alzheimer’s" in text:
+    #     print("A-True")
+    #     case = [sentence + '.' for sentence in text.split('.') if "alzheimer’s" in sentence]
+    # elif "dementia" in text:
+    #     print("M-True")
+    # else:
+    #     print("false")
     # for term in key_terms:
     #     case = [sentence + '.' for sentence in text.split('.') if term in sentence]
     #     # print(type(case))
