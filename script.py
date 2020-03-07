@@ -31,13 +31,15 @@ for file in all_files:
         if len(case) == 0:
             status = [False]
             case = ["NO OCCURENCES"]
-            case_list.append(case)
+    case_list.append(case)
+    status_list.append(status)
+
     #         elif "alzheimer’s" in case and "dementia" in case:
     #             status = "ALZ"
     #         elif "alzheimer’s" not in case and "dementia"
 
-    print(f"status is {status} and sentence is {case}")
+    # print(f"status is {status} and sentence is {case}")
     # print(f"{case} in {file}")
 print(dates_list)
-# print(case_list)
-# print(cognitive_list)
+print(case_list)
+print(status_list)
