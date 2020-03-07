@@ -11,7 +11,9 @@ dates_list = []
 occurence_list = []
 cognition_list = []
 status_list = []
-for file in all_files:
+positive_decision_list = []
+for file in all_files[:10]:
+    print(f"Processing document {file}")
     text = extract_text(file)
     text = text.lower()
     match = re.findall(('request: .+'), text)
@@ -19,6 +21,24 @@ for file in all_files:
     date = [item.replace('request:', "").strip() for item in match]
     # print(f"date : {date}")
     dates_list.append(date)
+
+    decision_keys = [
+    "is not correct and is reversed",
+    "as required by 18 nycrr 358-6.4",
+     "must comply immediately"
+     ]
+    # print(decision_keys)
+    appeals_list =[]
+    for decision in decision_keys:
+        appeal_decision = text.count(decision)
+        appeals_list.append(appeal_decision)
+    print(appeals_list)
+    if any(appeals_list) == True:
+        positive = True
+    else:
+        positive = False
+    positive_decision_list.append(positive)
+
 
     # print(file)
     # print(text)
@@ -34,12 +54,9 @@ for file in all_files:
     occurence_list.append(occurence)
     cognition_list.append(cognition)
 
-    #         elif "alzheimer’s" in case and "dementia" in case:
-    #             status = "ALZ"
-    #         elif "alzheimer’s" not in case and "dementia"
 
-    # print(f"status is {status} and sentence is {case}")
-    # print(f"{case} in {file}")
+#
 print(dates_list)
 print(occurence_list)
 print(cognition_list)
+print(positive_decision_list)
