@@ -17,9 +17,11 @@ cognition_list = []
 status_list = []
 positive_decision_list = []
 decision_date_list = []
-for file in all_files[0:10]:
+start = 0
+end = 101
+for file in all_files[start:end]:
 
-    print(f" Processing {count} of {total} document: {file}")
+    print(f" Processing {count} of {end} document: {file}")
     count += 1
     text = extract_text(file)
     text = text.lower()
@@ -63,29 +65,28 @@ for file in all_files[0:10]:
     # print(text)
 
     for sentence in file:
-        ignore = 'it provides, in relevant part:'
+        ignore = 'it provides, in relevant part'
 #         print(sentence)
         mentions = [sentence + '.' for sentence in text.split('.') if "dementia" in sentence or "alzheimer’s" in sentence and "it provides, in relevant part:a state" not in sentence]
         mentions = [item.replace('\n\n', "").replace('\n', '').strip() for item in mentions]
+    # print(mentions)
+    # print(len(mentions))
+    for mention in mentions:
+        if ignore in mention:
+            mentions.remove(mention)
+                # print(mention)
+    if len(mentions) == 0:
+        cognition = [False]
+        mentions = ["NO OCCURENCES"]
 
-        if ignore in mentions and len(mentions) >= 1:
-            cognition = [False]
-            mentions = ["NO OCCURENCES"]
-            # print(f"LALALALA {mentions}")
-    #         print(case)
-    #         print(len(case))
-        elif len(mentions) == 0:
-            cognition = [False]
-            mentions = ["NO OCCURENCES"]
-
-        else:
+    else:
             cognition = [True]
 
     mentions_list.append(mentions)
     cognition_list.append(cognition)
     # print(f"HELLLLLLO: {mentions}")
 
-print(dates_list)
+# print(dates_list)
 # print(mentions_list)
 # print(cognition_list)
 # print(positive_decision_list)
@@ -114,9 +115,10 @@ for alist in mentions_list:
 flat_decision_date_list = [item for sublist in decision_date_list for item in sublist]
 # print(f'Flat decision: {flat_decision_date_list}')
 
-# flat_positive_decision_list = [item for sublist in positive_decision_list for item in sublist]
+## TURN OFF breaks csv builder
+##flat_positive_decision_list = [item for sublist in positive_decision_list for item in sublist]
 
-files_list = [item.replace("pdfs/Redacted_", "") for item in all_files[11:100]]
+files_list = [item.replace("pdfs/Redacted_", "") for item in all_files[start:end]]
 
 decisions_dict_list = []
 for (file, date_a, date_d, cog, decision, text) in zip(files_list, appeal_dates_list, flat_decision_date_list, cognition_list, positive_decision_list, flat_mentions_list):
