@@ -18,10 +18,11 @@ status_list = []
 positive_decision_list = []
 decision_date_list = []
 start = 0
-end = 101
+end = 100
+process_num = end - start
 for file in all_files[start:end]:
 
-    print(f" Processing {count} of {end} document: {file}")
+    print(f" Processing {count} of {process_num} document: {file}")
     count += 1
     text = extract_text(file)
     text = text.lower()
@@ -34,6 +35,11 @@ for file in all_files[start:end]:
     # print(text.strip())
     decision_date_match = re.findall(('dated:?\s+albany, new york?\n?\n\d{2}/\d{2}/\d{4}'), text.strip(), flags=re.S)
     decision_date = [item.replace('dated: albany, new york\n\n', "").strip() for item in decision_date_match]
+    print(decision_date)
+    print(len(decision_date))
+    if len(decision_date) == 0:
+        decision_date = ["Date off Page"]
+    print(decision_date)
     decision_date_list.append(decision_date)
     # print(decision_date_match)
     if len(decision_date_match) == 0:
@@ -45,6 +51,7 @@ for file in all_files[start:end]:
 
     decision_keys = [
     "is not correct and is reversed",
+    "was not correct and is reversed",
     "as required by 18 nycrr 358-6.4",
      "must comply immediately"
      ]
@@ -129,7 +136,7 @@ for (file, date_a, date_d, cog, decision, text) in zip(files_list, appeal_dates_
 
 labels = ["file_id","date_appeal", "date_decision", "cognition_related", "positive_decision", "dementia-related-words" ]
 
-## csv file to be created with data
+# csv file to be created with data
 csv_file_name = "ltmc_decisions.csv"
 file_exists = os.path.isfile(csv_file_name)
 try:
