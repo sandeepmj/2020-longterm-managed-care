@@ -12,19 +12,22 @@ count = 1
 tester = 0
 key_terms = ["alzheimer’s", "dementia"]
 dates_list = []
-occurence_list = []
+mentions_list = []
 cognition_list = []
 status_list = []
 positive_decision_list = []
 decision_date_list = []
-for file in all_files[11:100]:
+start = 0
+end = 100
+process_num = end - start
+for file in all_files[start:end]:
 
-    print(f" Processing {count} of {total} document: {file}")
+    print(f" Processing {count} of {process_num} document: {file}")
     count += 1
     text = extract_text(file)
     text = text.lower()
     # print(text)
-    match = re.findall(('request: .+'), text)
+    match = re.findall(('request:\s\w+\s\d{0,2},\s\d{4}'), text)
     # date = match.replace('request:', "")
     date = [item.replace('request:', "").strip() for item in match]
     # print(f"date : {date}")
@@ -32,6 +35,11 @@ for file in all_files[11:100]:
     # print(text.strip())
     decision_date_match = re.findall(('dated:?\s+albany, new york?\n?\n\d{2}/\d{2}/\d{4}'), text.strip(), flags=re.S)
     decision_date = [item.replace('dated: albany, new york\n\n', "").strip() for item in decision_date_match]
+    print(decision_date)
+    print(len(decision_date))
+    if len(decision_date) == 0:
+        decision_date = ["Date off Page"]
+    print(decision_date)
     decision_date_list.append(decision_date)
     # print(decision_date_match)
     if len(decision_date_match) == 0:
@@ -43,6 +51,7 @@ for file in all_files[11:100]:
 
     decision_keys = [
     "is not correct and is reversed",
+    "was not correct and is reversed",
     "as required by 18 nycrr 358-6.4",
      "must comply immediately"
      ]
@@ -61,21 +70,31 @@ for file in all_files[11:100]:
 
     # print(file)
     # print(text)
+
     for sentence in file:
+        ignore = 'it provides, in relevant part'
 #         print(sentence)
-        mentions = [sentence + '.' for sentence in text.split('.') if "dementia" in sentence or "alzheimer’s" in sentence]
-        cognition = [True]
-        occurence = [item.replace('\n\n', "").replace('\n', '').strip() for item in mentions]
-    #         print(case)
-    #         print(len(case))
-        if len(occurence) == 0:
-            cognition = [False]
-            occurence = ["NO OCCURENCES"]
-    occurence_list.append(occurence)
+        mentions = [sentence + '.' for sentence in text.split('.') if "dementia" in sentence or "alzheimer’s" in sentence and "it provides, in relevant part:a state" not in sentence]
+        mentions = [item.replace('\n\n', "").replace('\n', '').strip() for item in mentions]
+    # print(mentions)
+    # print(len(mentions))
+    for mention in mentions:
+        if ignore in mention:
+            mentions.remove(mention)
+                # print(mention)
+    if len(mentions) == 0:
+        cognition = [False]
+        mentions = ["NO OCCURENCES"]
+
+    else:
+            cognition = [True]
+
+    mentions_list.append(mentions)
     cognition_list.append(cognition)
+    # print(f"HELLLLLLO: {mentions}")
 
 # print(dates_list)
-print(occurence_list)
+# print(mentions_list)
 # print(cognition_list)
 # print(positive_decision_list)
 # print(decision_date_list)
@@ -91,11 +110,11 @@ for sublist in dates_list:
 # def firstItems(lst):
 #     return [item[0] for item in lst]
 
-flat_occurence_list=[]
-for alist in occurence_list:
+flat_mentions_list=[]
+for alist in mentions_list:
     together = '..........'.join(alist)
-    flat_occurence_list.append(together)
-print(flat_occurence_list)
+    flat_mentions_list.append(together)
+# print(flat_mentions_list)
 
 # flat_occurence_list = firstItems(occurence_list)
 # print(flat_occurence_list)
@@ -103,17 +122,17 @@ print(flat_occurence_list)
 flat_decision_date_list = [item for sublist in decision_date_list for item in sublist]
 # print(f'Flat decision: {flat_decision_date_list}')
 
-# flat_positive_decision_list = [item for sublist in positive_decision_list for item in sublist]
+## TURN OFF breaks csv builder
+##flat_positive_decision_list = [item for sublist in positive_decision_list for item in sublist]
 
-files_list = [item.replace("pdfs/Redacted_", "") for item in all_files[11:100]]
+files_list = [item.replace("pdfs/Redacted_", "") for item in all_files[start:end]]
 
 decisions_dict_list = []
-for (file, date_a, date_d, cog, decision, text) in zip(files_list, appeal_dates_list, flat_decision_date_list, cognition_list, positive_decision_list, flat_occurence_list):
+for (file, date_a, date_d, cog, decision, text) in zip(files_list, appeal_dates_list, flat_decision_date_list, cognition_list, positive_decision_list, flat_mentions_list):
     each_decision = {"file_id": file, 'date_appeal': date_a, 'date_decision': date_d, 'cognition_related': cog, "positive_decision": decision, "dementia-related-words": text}
     decisions_dict_list.append(each_decision)
 # print(decisions_dict_list)
-# for (files_list, dates_list, decision_date_list, cognition_list, positive_decision_list)
-# print(decisions_dict_list)
+
 
 labels = ["file_id","date_appeal", "date_decision", "cognition_related", "positive_decision", "dementia-related-words" ]
 
