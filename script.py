@@ -17,6 +17,8 @@ cognition_list = []
 status_list = []
 positive_decision_list = []
 decision_date_list = []
+s_care_bool = []
+twenty_four_care_bool =[]
 start = 0
 end = 100
 process_num = end - start
@@ -35,17 +37,42 @@ for file in all_files[start:end]:
     # print(text.strip())
     decision_date_match = re.findall(('dated:?\s+albany, new york?\n?\n\d{2}/\d{2}/\d{4}'), text.strip(), flags=re.S)
     decision_date = [item.replace('dated: albany, new york\n\n', "").strip() for item in decision_date_match]
-    print(decision_date)
-    print(len(decision_date))
+    # print(decision_date)
+    # print(len(decision_date))
     if len(decision_date) == 0:
         decision_date = ["Date off Page"]
-    print(decision_date)
+    # print(decision_date)
     decision_date_list.append(decision_date)
     # print(decision_date_match)
     if len(decision_date_match) == 0:
         tester +=1
 
 # print(f"total empties: {tester}")
+### Checks if split care was requested
+    s_care_request = []
+    split_hours = "split-shift care"
+    s_care = text.count(split_hours)
+    s_care_request.append(s_care)
+    if any(s_care_request) == True:
+        print("split care found")
+        split_care = True
+    else:
+        split_care = False
+    s_care_bool.append(split_care)
+
+## checks if 24-hour care was requested
+
+    care24_request = []
+    twofour_hours = "24-hour care"
+    twofour_care = text.count(twofour_hours)
+    care24_request.append(twofour_care)
+    if any(care24_request) == True:
+        print("24 hour care found")
+        twenty_four_care = True
+    else:
+        twenty_four_care = False
+    twenty_four_care_bool.append(split_care)
+
 
 
 
@@ -93,7 +120,7 @@ for file in all_files[start:end]:
     cognition_list.append(cognition)
     # print(f"HELLLLLLO: {mentions}")
 
-# print(dates_list)
+print(dates_list)
 # print(mentions_list)
 # print(cognition_list)
 # print(positive_decision_list)
@@ -120,7 +147,7 @@ for alist in mentions_list:
 # print(flat_occurence_list)
 
 flat_decision_date_list = [item for sublist in decision_date_list for item in sublist]
-# print(f'Flat decision: {flat_decision_date_list}')
+print(f'Flat decision: {flat_decision_date_list}')
 
 ## TURN OFF breaks csv builder
 ##flat_positive_decision_list = [item for sublist in positive_decision_list for item in sublist]
@@ -128,15 +155,16 @@ flat_decision_date_list = [item for sublist in decision_date_list for item in su
 files_list = [item.replace("pdfs/Redacted_", "") for item in all_files[start:end]]
 
 decisions_dict_list = []
-for (file, date_a, date_d, cog, decision, text) in zip(files_list, appeal_dates_list, flat_decision_date_list, cognition_list, positive_decision_list, flat_mentions_list):
-    each_decision = {"file_id": file, 'date_appeal': date_a, 'date_decision': date_d, 'cognition_related': cog, "positive_decision": decision, "dementia-related-words": text}
+for (file, date_a, date_d, cog, decision, split, twenty4, text) in zip(files_list, appeal_dates_list, flat_decision_date_list, cognition_list, positive_decision_list, s_care_bool, twenty_four_care_bool, flat_mentions_list):
+    each_decision = {"file_id": file, 'date_appeal': date_a, 'date_decision': date_d, 'cognition_related': cog, "positive_decision": decision, "split_care": split, "24_hour_care": twenty4, "dementia-related-words": text}
     decisions_dict_list.append(each_decision)
-# print(decisions_dict_list)
+print(decisions_dict_list)
+# print(s_care_bool)
+# print(twenty_four_care_bool)
 
+labels = ["file_id","date_appeal", "date_decision", "cognition_related", "positive_decision", "split_care", "24_hour_care", "dementia-related-words"]
 
-labels = ["file_id","date_appeal", "date_decision", "cognition_related", "positive_decision", "dementia-related-words" ]
-
-# csv file to be created with data
+## csv file to be created with data
 csv_file_name = "ltmc_decisions.csv"
 file_exists = os.path.isfile(csv_file_name)
 try:
