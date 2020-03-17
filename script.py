@@ -1,16 +1,26 @@
+## IMPORT LIBRARIES
+
 import glob
 from pdfminer.high_level import extract_text
 import re
 import os.path
 import csv
 
-
+## IMPORT PDFs
 path = 'pdfs' # use your path
 all_files = glob.glob(path + "/*.pdf")
+
+## track how many PDFs for counters
 total = len(all_files)
 count = 1
 tester = 0
+
+
+
+## key words to search
 key_terms = ["alzheimer’s", "dementia"]
+
+## LIST OF DICTIONARIES
 dates_list = []
 mentions_list = []
 cognition_list = []
@@ -19,35 +29,48 @@ positive_decision_list = []
 decision_date_list = []
 s_care_bool = []
 twenty_four_care_bool =[]
-start = 0
-end = 100
-process_num = end - start
-for file in all_files[start:end]:
 
+## how many PDFs to process
+start = 0
+end = 10
+process_num = end - start
+
+## Process PDFs
+for file in all_files[start:end]:
+    ## counters
     print(f" Processing {count} of {process_num} document: {file}")
     count += 1
+
+    ## extract text from PDFs
     text = extract_text(file)
     text = text.lower()
-    # print(text)
+
+    ## Matches dates of appeals request
     match = re.findall(('request:\s\w+\s\d{0,2},\s\d{4}'), text)
     # date = match.replace('request:', "")
+
+    ## LC (list comprehension to create list of stripped down dates)
     date = [item.replace('request:', "").strip() for item in match]
-    # print(f"date : {date}")
+
+    ## append to list of lists
     dates_list.append(date)
-    # print(text.strip())
+
+    ## Find decision date
     decision_date_match = re.findall(('dated:?\s+albany, new york?\n?\n\d{2}/\d{2}/\d{4}'), text.strip(), flags=re.S)
+    ## LC to create decision date list
     decision_date = [item.replace('dated: albany, new york\n\n', "").strip() for item in decision_date_match]
-    # print(decision_date)
-    # print(len(decision_date))
+
+    ## Some dates don't follow regex pattern by going to next line.
+    ## Convert any entries with no date to Date off page
     if len(decision_date) == 0:
         decision_date = ["Date off Page"]
-    # print(decision_date)
+
     decision_date_list.append(decision_date)
     # print(decision_date_match)
+    ## NOT SURE WHY I ADDED THIS - perhaps in case no match found to begin with in a PDF
     if len(decision_date_match) == 0:
         tester +=1
 
-# print(f"total empties: {tester}")
 ### Checks if split care was requested
     s_care_request = []
     split_hours = "split-shift care"
@@ -61,7 +84,6 @@ for file in all_files[start:end]:
     s_care_bool.append(split_care)
 
 ## checks if 24-hour care was requested
-
     care24_request = []
     twofour_hours = "24-hour care"
     twofour_care = text.count(twofour_hours)
@@ -74,8 +96,9 @@ for file in all_files[start:end]:
     twenty_four_care_bool.append(split_care)
 
 
+## Appeals decision
 
-
+## Look for these phrases
     decision_keys = [
     "is not correct and is reversed",
     "was not correct and is reversed",
@@ -83,6 +106,9 @@ for file in all_files[start:end]:
      "must comply immediately"
      ]
     # print(decision_keys)
+
+## if the phrase appears, put in list
+## if they appear 1 or more times, make it true otherwise false.
     appeals_list =[]
     for decision in decision_keys:
         appeal_decision = text.count(decision)
@@ -97,7 +123,10 @@ for file in all_files[start:end]:
 
     # print(file)
     # print(text)
-
+## Check to see if alzheimer's or dementia related.
+## need to ignore some mentions of ALZ and Dementia because in boilerplate notice
+## Notice begins with what is in ignore variable
+## if both either word is found in sentence that begins with Ignore, it removes that sentence from mentions
     for sentence in file:
         ignore = 'it provides, in relevant part'
 #         print(sentence)
@@ -120,45 +149,54 @@ for file in all_files[start:end]:
     cognition_list.append(cognition)
     # print(f"HELLLLLLO: {mentions}")
 
-print(dates_list)
+## test printing all the lists
+# print(dates_list)
 # print(mentions_list)
 # print(cognition_list)
 # print(positive_decision_list)
 # print(decision_date_list)
 
 ## flatten dates_list which currently is a list with each date as a list. breaking conversion to csv
-appeal_dates_list = []
-for sublist in dates_list:
-    for item in sublist:
-        appeal_dates_list.append(item)
-# print(appeal_dates_list)
+# appeal_dates_list = []
+# for sublist in dates_list:
+#     for item in sublist:
+#         appeal_dates_list.append(item)
+
+        ## LC version:
+appeal_dates_list = [item for sublist in dates_list for item in sublist]
+print(appeal_dates_list)
 
 ## Flatten lists of lists because causing probkems with reading csv_file_name
-# def firstItems(lst):
-#     return [item[0] for item in lst]
 
-flat_mentions_list=[]
-for alist in mentions_list:
-    together = '..........'.join(alist)
-    flat_mentions_list.append(together)
+
+# flat_mentions_list=[]
+# for alist in mentions_list:
+#     together = '..........'.join(alist)
+#     flat_mentions_list.append(together)
+## LC version:
+flat_mentions_list = ['..........'.join(alist) for alist in mentions_list]
+
 # print(flat_mentions_list)
 
 # flat_occurence_list = firstItems(occurence_list)
 # print(flat_occurence_list)
 
-flat_decision_date_list = [item for sublist in decision_date_list for item in sublist]
-print(f'Flat decision: {flat_decision_date_list}')
+flat_decision_date_list = [item.strip().replace("dated:\n\nalbany, new york\n\n", "") for sublist in decision_date_list for item in sublist]
+# print(f'Flat decision: {flat_decision_date_list}')
+
 
 ## TURN OFF breaks csv builder
 ##flat_positive_decision_list = [item for sublist in positive_decision_list for item in sublist]
 
+## Simply removes the folder and redacted file name on pdf file names
 files_list = [item.replace("pdfs/Redacted_", "") for item in all_files[start:end]]
 
+## Zip various lists into dictionary
 decisions_dict_list = []
 for (file, date_a, date_d, cog, decision, split, twenty4, text) in zip(files_list, appeal_dates_list, flat_decision_date_list, cognition_list, positive_decision_list, s_care_bool, twenty_four_care_bool, flat_mentions_list):
     each_decision = {"file_id": file, 'date_appeal': date_a, 'date_decision': date_d, 'cognition_related': cog, "positive_decision": decision, "split_care": split, "24_hour_care": twenty4, "dementia-related-words": text}
     decisions_dict_list.append(each_decision)
-print(decisions_dict_list)
+# print(decisions_dict_list)
 # print(s_care_bool)
 # print(twenty_four_care_bool)
 
