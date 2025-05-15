@@ -5,7 +5,8 @@ This data journalism project investigates how long the New York State Department
 ## Byline and Credits
 
 **By:** Sandeep Junnarkar  
-**Affiliation:** WNYC
+**Affiliation:** Bloomberg
+
 **Date:** 2020
 
 ---
